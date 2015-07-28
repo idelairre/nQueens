@@ -65,8 +65,12 @@ class Palindrome {
 			Palindrome palindrome = new Palindrome("Able was I ere I saw Elba"); 
 			Palindrome palindrome2 = new Palindrome("radar"); 
 			Palindrome palindrome3 = new Palindrome("A but tuba."); 
+			Palindrome palindrome4 = new Palindrome("In public in private by Edin Denby."); 
+			Palindrome palindrome5 = new Palindrome("Morning \n (ripped out of my mind again!)"); 
 			palindrome.test();
 			palindrome2.test();
 			palindrome3.test();
+			palindrome4.test();
+			palindrome5.test();
 		}
 	}

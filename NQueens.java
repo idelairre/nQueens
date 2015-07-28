@@ -22,14 +22,6 @@ class NQueens {
 		public Column getCol() {
 			return this.column;
 		}
-		
-		public void setRow(Row row) {
-			this.row = row;
-		}
-
-		public void setCol(Column column) {
-			this.column = column;
-		}
 	}
 	
 	public NQueens(int n) {
@@ -61,14 +53,19 @@ class NQueens {
 		return true;
 	}
 	
-	public void cycle(Position position) {
+	public Position cycle(Position position) {
+		int i = 0;
 		if (((Integer) position.getCol()) >= boardSize - 1) {
 			System.out.println("cycling positions");
  			while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
-				position = new Position(position.getRow(), 0);
-				nQueen(position);			
+				i++;
+				position = new Position(position.getRow(), i);
+				if ((Integer) position.getCol() == boardSize) {
+					return backtrack();
+				}
 	 		}
 		}
+		return position;
 	}
 	
 	// takes a valid position and places it on the board
@@ -78,45 +75,42 @@ class NQueens {
 		board[row][col] = true;
 	}
 	
+	// takes a position passes it through several gates to make sure backtrack 
+	// is called correctly, the position isn't out of bounds, or the problem isn't solved
+	// increments the column by 1 if it isn't valid
+	// increments the row by 1 if it is and resets the column to 0
 	public void nQueen(Position position) {
 		printBoard();
 		if ((((Integer) position.getCol())) >= boardSize - 1 && positions.size() != boardSize && !validate(position)) {
+			System.out.println("reached the end column");
 			nQueen(backtrack());
-			// looks like there is a problem here for a size 4 board
-		} else if ((((Integer) position.getRow())) == boardSize - 1 && positions.size() != boardSize && !validate(position)) {
+		} else if ((((Integer) position.getRow())) == boardSize - 1 && positions.size() != boardSize && !validate(position)) { // stops it from going out of bounds
 			System.out.println("reached last row and the problem isn't solved");
-			nQueen(backtrack());
+			cycle(position);
 		} else if (boardSize == positions.size()) {
 			System.out.println("solved. printing final queen positions");
 			printBoard();
 			System.exit(0);
 		}
 		
+		// if it passes all the gates increment the column by 1 
  		while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
 			position = new Position(position.getRow(), ((Integer) position.getCol()) + 1);
 			nQueen(position);			
 	 	}
 		
-		// if it goes beyond the board size, catch it and start from 0
-		if (((Integer) position.getCol()) >= boardSize - 1) {
-			System.out.println("went out of bounds, cycling positions");
- 			while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
-				position = new Position(position.getRow(), 0);
-				nQueen(position);			
-	 		}
-		}
-		
-		System.out.println("final test to make sure position is valid...");
+//		System.out.println("final test to make sure position is valid...");
 		// final gate to make sure the position is valid
 		if (validate(position)) {
-			System.out.println("valid");
+//			System.out.println("valid");
 			position = position;
+			positions.push(position);
+			place(position);
+			System.out.println("placing queen on row " + position.getRow() + ", column " + position.getCol());
+			nQueen(new Position(((Integer) position.getRow()).intValue() + 1, 0)); // increment the row by 1
+		} else {
+			System.out.println("something went wrong");
 		}
-		
-		positions.push(position);
-		place(position);
-		System.out.println("placing queen on row " + position.getRow() + ", column " + position.getCol());
-		nQueen(new Position(((Integer) position.getRow()).intValue() + 1, 0)); // increment the row by 1
 	}
 	
 	// find and remove the queen in the query row in the stack
@@ -131,7 +125,10 @@ class NQueens {
 	}
 	
 	// takes the queen and move it to the next valid column position
-	// if it can't, backtrack again
+	// if the position is out if bounds it sets it to the queen at the top
+	// of the stack and returns it to backtrack()
+	// there is a hook in nQueen that will catch this and make sure backtrack
+	// is called again
 	public Position shiftQueen(Position oldPos) {
 		removeQueen();
 		System.out.println("shifting queen on row " + oldPos.getRow() + ", column " + oldPos.getCol());
@@ -141,7 +138,8 @@ class NQueens {
 			newPos = new Position(newPos.getRow(), ((Integer) newPos.getCol()) + 1);
 		}
 		
-		if (((Integer) newPos.getCol()) > boardSize - 1) {
+		// makes sure the position isn't beyond the board size
+		if (((Integer) newPos.getCol()) > boardSize - 1) { 
 			System.out.println("query position is beyond the board size");
 			newPos = shiftQueen(positions.peek());
 		}
@@ -189,8 +187,10 @@ class NQueens {
 	}
 	
 	public static void main(String[] args) {
-//		NQueens test = new NQueens(8);
-		NQueens test = new NQueens(4);
+		
+//		NQueens test = new NQueens(12);
+		NQueens test = new NQueens(8);
+//		NQueens test = new NQueens(4);
 		test.run();
 	}
 }
