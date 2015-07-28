@@ -61,6 +61,16 @@ class NQueens {
 		return true;
 	}
 	
+	public void cycle(Position position) {
+		if (((Integer) position.getCol()) >= boardSize - 1) {
+			System.out.println("cycling positions");
+ 			while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
+				position = new Position(position.getRow(), 0);
+				nQueen(position);			
+	 		}
+		}
+	}
+	
 	// takes a valid position and places it on the board
 	public void place(Position queen) {
 		int row = ((Integer) queen.getRow()).intValue();
@@ -72,6 +82,7 @@ class NQueens {
 		printBoard();
 		if ((((Integer) position.getCol())) >= boardSize - 1 && positions.size() != boardSize && !validate(position)) {
 			nQueen(backtrack());
+			// looks like there is a problem here for a size 4 board
 		} else if ((((Integer) position.getRow())) == boardSize - 1 && positions.size() != boardSize && !validate(position)) {
 			System.out.println("reached last row and the problem isn't solved");
 			nQueen(backtrack());
@@ -178,7 +189,8 @@ class NQueens {
 	}
 	
 	public static void main(String[] args) {
-		NQueens test = new NQueens(8);
+//		NQueens test = new NQueens(8);
+		NQueens test = new NQueens(4);
 		test.run();
 	}
 }
