@@ -68,44 +68,52 @@ class NQueens {
 		board[row][col] = true;
 	}
 	
+	// takes a position makes sure it isn't out of bounds
+	// if the position is not valid, increments the column by 1
+	// if an out of bounds column position does get through, resets it to zero and cycles through positions
+	// places the valid position on the board and increments the column
 	public void nQueen(Position position) {
 		printBoard();
-		if ((((Integer) position.getCol())) >= boardSize - 1 && positions.size() != boardSize && !validate(position)) {
-			nQueen(backtrack());
-		} else if ((((Integer) position.getRow())) == boardSize - 1 && positions.size() != boardSize && !validate(position)) {
-			System.out.println("reached last row and the problem isn't solved");
-			nQueen(backtrack());
-		} else if (boardSize == positions.size()) {
-			System.out.println("solved. printing final queen positions");
-			printBoard();
-			System.exit(0);
-		}
-		
- 		while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
-			position = new Position(position.getRow(), ((Integer) position.getCol()) + 1);
-			nQueen(position);			
-	 	}
-		
-		// if it goes beyond the board size, catch it and start from 0
-		if (((Integer) position.getCol()) >= boardSize - 1) {
-			System.out.println("went out of bounds, cycling positions");
- 			while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
-				position = new Position(position.getRow(), 0);
-				nQueen(position);			
-	 		}
-		}
-		
-		System.out.println("final test to make sure position is valid...");
-		// final gate to make sure the position is valid
-		if (validate(position)) {
-			System.out.println("valid");
-			position = position;
-		}
-		
-		positions.push(position);
-		place(position);
-		System.out.println("placing queen on row " + position.getRow() + ", column " + position.getCol());
-		nQueen(new Position(((Integer) position.getRow()).intValue() + 1, 0)); // increment the row by 1
+			if ((((Integer) position.getCol())) >= boardSize - 1 && positions.size() != boardSize && !validate(position)) {
+				nQueen(backtrack());
+			} else if ((((Integer) position.getRow())) == boardSize - 1 && positions.size() != boardSize && !validate(position)) {
+				System.out.println("reached last row and the problem isn't solved");
+				nQueen(backtrack());
+			} else if (boardSize == positions.size()) {
+				System.out.println("solved. printing final queen positions");
+				printBoard();
+				System.exit(0); // can't think of a smoother way to terminate at the moment, might have to parse nQueens into seperate methods to set appropriate breakpoints
+			}
+			while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
+				try {
+					position = new Position(position.getRow(), ((Integer) position.getCol()) + 1);
+					nQueen(position);			
+				} catch (StackOverflowError e) {
+					continue;
+				}
+			}
+
+			// if it goes beyond the board size, catch it and start from 0
+			if (((Integer) position.getCol()) >= boardSize - 1) {
+				System.out.println("went out of bounds, cycling positions");
+				while (!validate(position) && ((Integer) position.getCol()) < boardSize) {
+					position = new Position(position.getRow(), 0);
+					nQueen(position);			
+				}
+			}
+
+			System.out.println("final test to make sure position is valid...");
+			// final gate to make sure the position is valid
+			if (validate(position)) {
+				System.out.println("valid");
+				position = position;
+				positions.push(position);
+				place(position);
+				System.out.println("placing queen on row " + position.getRow() + ", column " + position.getCol());
+				nQueen(new Position(((Integer) position.getRow()).intValue() + 1, 0)); // increment the row by 1
+			} else {
+				System.out.println("something went wrong...");
+			}
 	}
 	
 	// find and remove the queen in the query row in the stack
@@ -178,7 +186,9 @@ class NQueens {
 	}
 	
 	public static void main(String[] args) {
-		NQueens test = new NQueens(8);
+//		NQueens test = new NQueens(8);
+		NQueens test = new NQueens(12);
+//		NQueens test = new NQueens(16);
 		test.run();
 	}
 }
